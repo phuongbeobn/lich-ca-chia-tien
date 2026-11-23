@@ -1,5 +1,6 @@
--- Shared group expenses with email/password sign-in, invite-only membership,
--- Row Level Security, and realtime updates.
+-- Publicly joinable shared expenses with email/password sign-in,
+-- Row Level Security, and realtime updates. Any authenticated account joins
+-- the shared group automatically and can read, add, and delete its expenses.
 
 create extension if not exists pgcrypto with schema extensions;
 create schema if not exists private;
@@ -7,7 +8,6 @@ create schema if not exists private;
 create table if not exists public.shared_groups (
   id uuid primary key default gen_random_uuid(),
   name text not null default 'Nhóm chi tiêu',
-  invite_code_hash text not null unique,
   created_at timestamptz not null default now()
 );
 
@@ -56,55 +56,30 @@ revoke all on function private.is_shared_group_member(uuid) from public, anon;
 grant usage on schema private to authenticated;
 grant execute on function private.is_shared_group_member(uuid) to authenticated;
 
-create or replace function public.join_shared_group(invite_code text)
-returns uuid
+create or replace function public.my_shared_groups()
+returns table (group_id uuid, group_name text)
 language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  matched_group uuid;
 begin
   if auth.uid() is null then
     raise exception 'Bạn cần đăng nhập trước.';
   end if;
 
-  select group_row.id into matched_group
-  from public.shared_groups as group_row
-  where group_row.invite_code_hash = encode(
-    extensions.digest(convert_to(btrim(invite_code), 'UTF8'), 'sha256'),
-    'hex'
-  )
-  limit 1;
-
-  if matched_group is null then
-    raise exception 'Mã nhóm không đúng.';
-  end if;
-
   insert into public.shared_group_members (group_id, user_id)
-  values (matched_group, auth.uid())
+  select group_row.id, (select auth.uid())
+  from public.shared_groups as group_row
   on conflict do nothing;
 
-  return matched_group;
+  return query
+  select group_row.id, group_row.name
+  from public.shared_groups as group_row
+  order by group_row.created_at;
 end;
 $$;
 
-create or replace function public.my_shared_groups()
-returns table (group_id uuid, group_name text)
-language sql
-stable
-security definer
-set search_path = ''
-as $$
-  select group_row.id, group_row.name
-  from public.shared_groups as group_row
-  join public.shared_group_members as member on member.group_id = group_row.id
-  where member.user_id = (select auth.uid());
-$$;
-
-revoke all on function public.join_shared_group(text) from public, anon;
 revoke all on function public.my_shared_groups() from public, anon;
-grant execute on function public.join_shared_group(text) to authenticated;
 grant execute on function public.my_shared_groups() to authenticated;
 
 drop policy if exists "Group members read shared expenses" on public.shared_expenses;
@@ -121,9 +96,12 @@ create policy "Group members add shared expenses"
   );
 
 drop policy if exists "Group members remove shared expenses" on public.shared_expenses;
-create policy "Group members remove shared expenses"
+create policy "Authors remove own shared expenses"
   on public.shared_expenses for delete to authenticated
-  using (private.is_shared_group_member(group_id));
+  using (
+    private.is_shared_group_member(group_id)
+    and created_by = (select auth.uid())
+  );
 
 do $$
 begin

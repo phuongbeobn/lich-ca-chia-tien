@@ -14,3 +14,5 @@
 .history-delete{width:23px;height:23px;flex:0 0 23px;display:grid;place-items:center;padding:0;border:1px solid #f0d8d0;border-radius:6px;background:#fff8f5;color:#b66a53;cursor:pointer;transition:background .15s,color .15s}.history-delete svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.history-delete:hover{background:#fbe9e2;color:#984a35}.history-delete:focus-visible{outline:2px solid #d99362;outline-offset:2px}
 
 .history-delete.locked{border-color:#e7eae6;background:#f7f8f6;color:#a9b1aa}.history-delete.locked:hover{border-color:#d8ded8;background:#eef1ed;color:#78857b}
+
+@media(max-width:620px){.history-item{gap:7px}.history-delete{display:grid!important;width:30px;height:30px;flex:0 0 30px;opacity:1;visibility:visible;background:#fff1eb;border-color:#efcbbd}.history-delete svg{width:16px;height:16px}}

@@ -17,8 +17,8 @@
 
 @media(max-width:620px){.history-item{gap:7px}.history-delete{display:grid!important;width:30px;height:30px;flex:0 0 30px;opacity:1;visibility:visible;background:#fff1eb;border-color:#efcbbd}.history-delete svg{width:16px;height:16px}}
 
-.shift-chip.day{background-color:#d8f0f8;background-image:linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,.28)),url("assets/shift-day-bg.png");background-size:cover;background-position:center 46%;color:#365b63;text-shadow:0 1px 2px rgba(255,255,255,.9)}
-.shift-chip.night{background-color:#252f50;background-image:linear-gradient(rgba(20,28,54,.18),rgba(20,28,54,.18)),url("assets/shift-night-bg.png");background-size:cover;background-position:center 46%;color:#fff4a8;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.shift-chip.day{background-color:#d8f0f8;background-image:linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,.28)),url("assets/shift-day-bg.png");background-size:100% 100%;background-position:center;color:#365b63;text-shadow:0 1px 2px rgba(255,255,255,.9)}
+.shift-chip.night{background-color:#252f50;background-image:linear-gradient(rgba(20,28,54,.18),rgba(20,28,54,.18)),url("assets/shift-night-bg.png");background-size:100% 100%;background-position:center;color:#fff4a8;text-shadow:0 1px 3px rgba(0,0,0,.8)}
 
 .shift-chip .shift-time{display:block;line-height:1.25}
 

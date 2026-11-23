@@ -3,6 +3,10 @@
 
 drop function if exists public.join_shared_group(text);
 alter table public.shared_groups drop column if exists invite_code_hash;
+alter table public.shared_expenses add column if not exists participants text[] not null default array['phuong', 'dung', 'duong']::text[];
+alter table public.shared_expenses drop constraint if exists shared_expenses_participants_check;
+alter table public.shared_expenses add constraint shared_expenses_participants_check
+  check (cardinality(participants) between 1 and 3 and participants <@ array['phuong', 'dung', 'duong']::text[]);
 
 create or replace function public.my_shared_groups()
 returns table (group_id uuid, group_name text)

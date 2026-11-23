@@ -22,6 +22,7 @@ create table if not exists public.shared_expenses (
   id uuid primary key default gen_random_uuid(),
   group_id uuid not null references public.shared_groups(id) on delete cascade,
   paid_by text not null check (paid_by in ('phuong', 'dung', 'duong')),
+  participants text[] not null default array['phuong', 'dung', 'duong']::text[] check (cardinality(participants) between 1 and 3 and participants <@ array['phuong', 'dung', 'duong']::text[]),
   amount bigint not null check (amount > 0),
   note text not null default '',
   created_by uuid not null references auth.users(id),

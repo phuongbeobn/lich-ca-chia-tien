@@ -81,15 +81,18 @@ function renderExpenses(){
   document.querySelector('#settlement').innerHTML=visibleRows.length?visibleRows.map(row=>`<div class="settlement-row"><span><strong>${person(row.from).name}</strong> trả <strong>${person(row.to).name}</strong></span><span class="amount debt">${fmtRoundedMoney(row.amount)} ₫</span></div>`).join(''):'<div class="settlement-empty">Mọi người đang cân bằng ✨</div>';
   const history=document.querySelector('#history-list');
   if(!transactions.length){history.innerHTML='<div class="empty-state"><div class="empty-icon">◌</div>Chưa có khoản chi nào. Thêm khoản đầu tiên nhé.</div>';return}
-  history.innerHTML=[...transactions].reverse().map(t=>{const canDelete=!syncMode||(currentUser&&t.created_by===currentUser.id);return`<div class="history-item">${canDelete?`<button class="history-delete" type="button" data-expense-id="${escapeHTML(String(t.id))}" aria-label="Xóa khoản chi" title="Xóa khoản chi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg></button>`:''}<span class="avatar ${t.person}">${person(t.person).initial}</span><div class="history-info"><div class="history-title">${escapeHTML(t.note||`Khoản chi của ${person(t.person).name}`)}</div><div class="history-date">${person(t.person).name} đã thanh toán · chia cho ${transactionParticipants(t).map(id=>person(id).name).join(', ')} · ${fmt(new Date(t.at),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div><span class="history-amount">${fmtRoundedMoney(t.amount)} ₫</span></div>`}).join('');
+  history.innerHTML=[...transactions].reverse().map(t=>{const canDelete=!syncMode||(currentUser&&t.created_by===currentUser.id);return`<div class="history-item"><button class="history-delete ${canDelete?'':'locked'}" type="button" data-expense-id="${escapeHTML(String(t.id))}" aria-label="${canDelete?'Xóa khoản chi':'Chỉ người nhập mới xóa được khoản chi này'}" title="${canDelete?'Xóa khoản chi':'Chỉ người nhập mới được xóa'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg></button><span class="avatar ${t.person}">${person(t.person).initial}</span><div class="history-info"><div class="history-title">${escapeHTML(t.note||`Khoản chi của ${person(t.person).name}`)}</div><div class="history-date">${person(t.person).name} đã thanh toán · chia cho ${transactionParticipants(t).map(id=>person(id).name).join(', ')} · ${fmt(new Date(t.at),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div><span class="history-amount">${fmtRoundedMoney(t.amount)} ₫</span></div>`}).join('');
   history.querySelectorAll('.history-delete').forEach(button=>button.onclick=()=>deleteExpense(button.dataset.expenseId));
 }
 async function deleteExpense(id){
   const transaction=transactions.find(item=>String(item.id)===String(id));
-  if(!transaction||!confirm(`Xóa khoản “${transaction.note||`Khoản chi của ${person(transaction.person).name}`}” này?`))return;
+  if(!transaction)return;
+  if(syncMode&&(!currentUser||transaction.created_by!==currentUser.id)){setSyncMessage('Chỉ tài khoản đã nhập khoản chi này mới được xóa.',true);return}
+  if(!confirm(`Xóa khoản “${transaction.note||`Khoản chi của ${person(transaction.person).name}`}” này?`))return;
   if(syncMode&&syncClient&&activeGroupId){
-    const{error}=await syncClient.from('shared_expenses').delete().eq('id',id).eq('group_id',activeGroupId);
+    const{data,error}=await syncClient.from('shared_expenses').delete().eq('id',id).eq('group_id',activeGroupId).select('id');
     if(error){setSyncMessage(`Không xóa được khoản chi: ${error.message}`,true);return}
+    if(!data?.length){setSyncMessage('Không tìm thấy khoản chi hoặc tài khoản này không có quyền xóa.',true);await loadSharedExpenses();return}
     await loadSharedExpenses();
   }else{
     transactions=transactions.filter(item=>String(item.id)!==String(id));

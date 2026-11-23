@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <div class="app-shell">
@@ -28,11 +28,14 @@
       </section>
       <section id="expenses-page" class="page hidden">
         <div class="section-heading"><div><div class="eyebrow">QUỸ CHI TIÊU CHUNG</div><h2>Chia sẻ nhẹ nhàng</h2></div><div class="currency-label">ĐƠN VỊ <strong>VNĐ</strong></div></div>
-        <div class="expense-grid"><div class="expense-left"><article class="card expense-form"><div class="form-heading"><span class="step">01</span><div><h3>Thêm khoản chi</h3><p>Ai đã thanh toán khoản này?</p></div></div><div class="people-picker" id="people-picker"></div><label class="field-label" for="amount">SỐ TIỀN ĐÃ THANH TOÁN</label><div class="amount-wrap"><input id="amount" type="text" inputmode="numeric" placeholder="0" autocomplete="off"><span>₫</span></div><label class="field-label" for="expense-note">GHI CHÚ <span class="optional">· không bắt buộc</span></label><input id="expense-note" class="note-input" type="text" placeholder="Ví dụ: Ăn tối cuối tuần"><button class="primary-button" id="pay-button">Ghi khoản chi <span>→</span></button><div class="form-hint">Khoản chi được chia đều cho cả 3 người.</div></article><div class="people-summary" id="people-summary"></div></div><div class="expense-right"><article class="card balance-card"><div class="card-kicker">TỔNG QUAN NHÓM <span class="balance-period">ĐANG THEO DÕI</span></div><div class="total-amount" id="total-spent">0 <small>₫</small></div><div class="total-caption">Tổng chi tiêu chung</div><div class="divider"></div><div class="settlement-title">Cân bằng thanh toán</div><div id="settlement"></div></article><article class="card history-card"><div class="history-header"><div><div class="card-kicker">HOẠT ĐỘNG</div><h3>Lịch sử khoản chi</h3></div><button class="text-button" id="clear-history">Xóa tất cả</button></div><div id="history-list"></div></article></div></div>
+        <section id="sync-panel" class="card sync-panel" aria-live="polite"></section>
+        <div id="expense-grid" class="expense-grid is-hidden"><div class="expense-left"><article class="card expense-form"><div class="form-heading"><span class="step">01</span><div><h3>Thêm khoản chi</h3><p>Ai đã thanh toán khoản này?</p></div></div><div class="people-picker" id="people-picker"></div><label class="field-label" for="amount">SỐ TIỀN ĐÃ THANH TOÁN</label><div class="amount-wrap"><input id="amount" type="text" inputmode="numeric" placeholder="0" autocomplete="off"><span>₫</span></div><label class="field-label" for="expense-note">GHI CHÚ <span class="optional">· không bắt buộc</span></label><input id="expense-note" class="note-input" type="text" placeholder="Ví dụ: Ăn tối cuối tuần"><button class="primary-button" id="pay-button">Ghi khoản chi <span>→</span></button><div class="form-hint">Khoản chi được chia đều cho cả 3 người.</div></article><div class="people-summary" id="people-summary"></div></div><div class="expense-right"><article class="card balance-card"><div class="card-kicker">TỔNG QUAN NHÓM <span class="balance-period">ĐANG ĐỒNG BỘ</span></div><div class="total-amount" id="total-spent">0 <small>₫</small></div><div class="total-caption">Tổng chi tiêu chung</div><div class="divider"></div><div class="settlement-title">Cân bằng thanh toán</div><div id="settlement"></div></article><article class="card history-card"><div class="history-header"><div><div class="card-kicker">HOẠT ĐỘNG</div><h3>Lịch sử khoản chi</h3></div><button class="text-button" id="clear-history">Xóa tất cả</button></div><div id="history-list"></div></article></div></div>
       </section>
       <footer><span>ĐƯỢC TẠO CHO NHỮNG NGÀY BẬN RỘN</span><span>♡ &nbsp; Một nhịp sống cân bằng</span></footer>
     </main>
   </div>
-  <script src="app.js?v=7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

@@ -46,13 +46,43 @@ function renderSelected(){const[y,m,d]=selectedKey.split('-').map(Number),day=ne
 document.querySelector('#prev-month').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);renderCalendar()};document.querySelector('#next-month').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);renderCalendar()};document.querySelector('#go-today').onclick=()=>{viewDate=new Date();selectedKey=isoDay(viewDate);renderCalendar();renderSelected()};
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('hidden',p.id!==`${t.dataset.page}-page`))});
 function fmtMoney(n){return new Intl.NumberFormat('vi-VN').format(n)}
-function fmtRoundedMoney(n){return new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(Math.round(n/1000)*1000)}
+function fmtRoundedMoney(n){return new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(Math.floor(Math.max(0,n)/1000)*1000)}
 function person(id){return people.find(p=>p.id===id)}
 function renderPicker(){document.querySelector('#people-picker').innerHTML=people.map(p=>`<button class="person-option ${p.id===selectedPerson?'selected':''}" data-person="${p.id}"><span class="avatar ${p.id}">${p.initial}</span><span class="person-name">${p.name}</span></button>`).join('');document.querySelectorAll('.person-option').forEach(b=>b.onclick=()=>{selectedPerson=b.dataset.person;renderPicker()})}
 function transactionParticipants(transaction){const ids=Array.isArray(transaction.participants)?transaction.participants.filter(id=>people.some(p=>p.id===id)):people.map(p=>p.id);const unique=[...new Set(ids)];return unique.length?unique:people.map(p=>p.id)}
 function renderSplitPicker(){const picker=document.querySelector('#split-picker');picker.innerHTML=people.map(p=>`<button class="person-option split-person-option ${splitPeople.has(p.id)?'selected':''}" type="button" data-person="${p.id}" aria-pressed="${splitPeople.has(p.id)}"><span class="avatar ${p.id}">${p.initial}</span><span class="person-name">${p.name}</span><span class="split-check">${splitPeople.has(p.id)?'✓':''}</span></button>`).join('');picker.querySelectorAll('.split-person-option').forEach(button=>button.onclick=()=>{const id=button.dataset.person;if(splitPeople.has(id)&&splitPeople.size===1)return;splitPeople.has(id)?splitPeople.delete(id):splitPeople.add(id);renderSplitPicker()});document.querySelector('#split-hint').textContent=`Chia đều cho ${splitPeople.size} người: ${people.filter(p=>splitPeople.has(p.id)).map(p=>p.name).join(', ')}.`}
 document.querySelector('#select-all-split').onclick=()=>{splitPeople=new Set(people.map(p=>p.id));renderSplitPicker()};
-function renderExpenses(){const total=transactions.reduce((sum,t)=>sum+Number(t.amount||0),0),owed=Object.fromEntries(people.map(p=>[p.id,0]));for(const t of transactions){const each=Number(t.amount||0)/transactionParticipants(t).length;for(const id of transactionParticipants(t))owed[id]+=each}document.querySelector('#total-spent').innerHTML=`${fmtRoundedMoney(total)} <small>₫</small>`;document.querySelector('#people-summary').innerHTML=people.map(p=>`<div class="summary-person"><div class="mini"><span class="avatar ${p.id}">${p.initial}</span>${p.name}</div><strong>${fmtRoundedMoney(owed[p.id])} ₫</strong><small>Phần phải góp</small></div>`).join('');const net=people.map(p=>({p,net:transactions.filter(t=>t.person===p.id).reduce((sum,t)=>sum+Number(t.amount||0),0)-owed[p.id]}));let creditors=net.filter(x=>x.net>0.5).map(x=>({...x})),debtors=net.filter(x=>x.net<-.5).map(x=>({...x})),rows=[];for(const d of debtors)for(const c of creditors){const amount=Math.min(-d.net,c.net);if(amount>.5)rows.push(`<div class="settlement-row"><span><strong>${d.p.name}</strong> trả <strong>${c.p.name}</strong></span><span class="amount debt">${fmtRoundedMoney(amount)} ₫</span></div>`),d.net+=amount,c.net-=amount}document.querySelector('#settlement').innerHTML=rows.length?rows.join(''):'<div class="settlement-empty">Mọi người đang cân bằng ✨</div>';const history=document.querySelector('#history-list');if(!transactions.length){history.innerHTML='<div class="empty-state"><div class="empty-icon">◌</div>Chưa có khoản chi nào. Thêm khoản đầu tiên nhé.</div>';return}history.innerHTML=[...transactions].reverse().map(t=>`<div class="history-item"><span class="avatar ${t.person}">${person(t.person).initial}</span><div class="history-info"><div class="history-title">${escapeHTML(t.note||`Khoản chi của ${person(t.person).name}`)}</div><div class="history-date">${person(t.person).name} đã thanh toán · chia cho ${transactionParticipants(t).map(id=>person(id).name).join(', ')} · ${fmt(new Date(t.at),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div><span class="history-amount">${fmtRoundedMoney(t.amount)} ₫</span></div>`).join('')}
+function buildSettlementRows(){
+  const debts=Object.fromEntries(people.map(from=>[from.id,Object.fromEntries(people.map(to=>[to.id,0]))]));
+  const owed=Object.fromEntries(people.map(p=>[p.id,0]));
+  for(const transaction of transactions){
+    const participants=transactionParticipants(transaction);
+    const share=Number(transaction.amount||0)/participants.length;
+    for(const id of participants)owed[id]+=share;
+    const payer=transaction.person;
+    if(!people.some(p=>p.id===payer))continue;
+    for(const participant of participants){
+      if(participant!==payer)debts[participant][payer]+=share;
+    }
+  }
+  const rows=[];
+  for(let i=0;i<people.length;i++)for(let j=i+1;j<people.length;j++){
+    const first=people[i],second=people[j],net=debts[first.id][second.id]-debts[second.id][first.id];
+    if(net>0.5)rows.push({from:first.id,to:second.id,amount:net});
+    else if(net<-.5)rows.push({from:second.id,to:first.id,amount:-net});
+  }
+  return{owed,rows};
+}
+function renderExpenses(){
+  const total=transactions.reduce((sum,t)=>sum+Number(t.amount||0),0),{owed,rows}=buildSettlementRows();
+  document.querySelector('#total-spent').innerHTML=`${fmtRoundedMoney(total)} <small>₫</small>`;
+  document.querySelector('#people-summary').innerHTML=people.map(p=>`<div class="summary-person"><div class="mini"><span class="avatar ${p.id}">${p.initial}</span>${p.name}</div><strong>${fmtRoundedMoney(owed[p.id])} ₫</strong><small>Phần phải góp</small></div>`).join('');
+  const visibleRows=rows.filter(row=>Math.floor(row.amount/1000)*1000>0);
+  document.querySelector('#settlement').innerHTML=visibleRows.length?visibleRows.map(row=>`<div class="settlement-row"><span><strong>${person(row.from).name}</strong> trả <strong>${person(row.to).name}</strong></span><span class="amount debt">${fmtRoundedMoney(row.amount)} ₫</span></div>`).join(''):'<div class="settlement-empty">Mọi người đang cân bằng ✨</div>';
+  const history=document.querySelector('#history-list');
+  if(!transactions.length){history.innerHTML='<div class="empty-state"><div class="empty-icon">◌</div>Chưa có khoản chi nào. Thêm khoản đầu tiên nhé.</div>';return}
+  history.innerHTML=[...transactions].reverse().map(t=>`<div class="history-item"><span class="avatar ${t.person}">${person(t.person).initial}</span><div class="history-info"><div class="history-title">${escapeHTML(t.note||`Khoản chi của ${person(t.person).name}`)}</div><div class="history-date">${person(t.person).name} đã thanh toán · chia cho ${transactionParticipants(t).map(id=>person(id).name).join(', ')} · ${fmt(new Date(t.at),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div><span class="history-amount">${fmtRoundedMoney(t.amount)} ₫</span></div>`).join('')
+}
 function setDashboardVisible(visible){document.querySelector('#expense-grid').classList.toggle('is-hidden',!visible)}
 function setSyncMessage(message,isError=false){const node=document.querySelector('#sync-message');if(node){node.textContent=message;node.classList.toggle('error',isError)}}
 function renderSetupPanel(){syncMode=false;try{transactions=JSON.parse(localStorage.getItem('nhipsong-expenses')||'[]')}catch{transactions=[]}setDashboardVisible(true);document.querySelector('#sync-panel').innerHTML=`<div class="sync-heading"><span class="sync-icon">↔</span><div><h3>Đồng bộ nhóm chưa được kết nối</h3><p>Dữ liệu hiện vẫn lưu trên thiết bị này; chưa chia sẻ với bạn bè.</p></div></div><p class="sync-help">Để bật đồng bộ, tạo dự án Supabase, chạy <strong>supabase/schema.sql</strong> và cấu hình <strong>supabase-config.js</strong>. Xem hướng dẫn trong README.</p><div class="sync-message warning" id="sync-message">Chế độ hiện tại: lưu riêng trên trình duyệt này.</div>`;renderExpenses()}

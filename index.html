@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7f2" />
+  <title>Lịch ca & Chia tiền</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=7" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Trang chủ"><span class="brand-mark">✳</span><span>nhịp<span class="brand-light">sống</span></span></a>
+      <div class="topbar-right"><span class="live-dot"></span><span id="live-clock">--:--:--</span><span class="timezone">GIỜ VIỆT NAM</span></div>
+    </header>
+    <main>
+      <nav class="tabs" aria-label="Chức năng"><button class="tab active" data-page="schedule"><span class="tab-icon">▦</span><span>Lịch ca làm việc</span><span class="tab-number">01</span></button><button class="tab" data-page="expenses"><span class="tab-icon">↗</span><span>Chia tiền chi tiêu</span><span class="tab-number">02</span></button></nav>
+      <section id="schedule-page" class="page">
+        <div class="section-heading"><div><div class="eyebrow">LỊCH TRỰC CỦA BẠN</div><h2>Nhịp làm việc</h2></div><div class="schedule-meta"><span class="legend"><i class="legend-dot day"></i>Ca ngày</span><span class="legend"><i class="legend-dot night"></i>Ca đêm</span><span class="legend"><i class="legend-dot off"></i>Nghỉ</span></div></div>
+        <div class="schedule-grid">
+          <article class="card calendar-card"><div class="calendar-header"><button class="icon-button" id="prev-month" aria-label="Tháng trước">←</button><div class="month-title" id="month-title">Tháng 11 <span>2026</span></div><button class="icon-button" id="next-month" aria-label="Tháng sau">→</button><button class="today-button" id="go-today">Hôm nay</button></div><div class="calendar-grid" id="calendar"></div><div class="calendar-foot"><span><i class="legend-dot day"></i>Ngày</span><span><i class="legend-dot night"></i>Đêm</span><span><i class="legend-dot off"></i>Nghỉ ngày lễ</span></div></article>
+          <aside class="right-column"><article class="card next-card"><div class="card-kicker"><span class="kicker-icon">◷</span> CA TIẾP THEO</div><div id="next-shift"></div><div class="countdown"><span class="countdown-dot"></span><span id="shift-status">ĐANG CẬP NHẬT</span></div></article><article class="card selected-card"><div class="card-kicker">CHI TIẾT NGÀY</div><div id="selected-detail"></div></article></aside>
+        </div>
+        <div class="schedule-note"><span class="note-icon">i</span><span>Lịch bắt đầu từ ca ngày <strong>23/11/2026, 08:00</strong>. Mỗi ca kéo dài 12 tiếng, sau đó nghỉ 24 tiếng. Thứ 7 và Chủ nhật vẫn tính ca; ngày lễ được nghỉ.</span></div>
+      </section>
+      <section id="expenses-page" class="page hidden">
+        <div class="section-heading"><div><div class="eyebrow">QUỸ CHI TIÊU CHUNG</div><h2>Chia sẻ nhẹ nhàng</h2></div><div class="currency-label">ĐƠN VỊ <strong>VNĐ</strong></div></div>
+        <div class="expense-grid"><div class="expense-left"><article class="card expense-form"><div class="form-heading"><span class="step">01</span><div><h3>Thêm khoản chi</h3><p>Ai đã thanh toán khoản này?</p></div></div><div class="people-picker" id="people-picker"></div><label class="field-label" for="amount">SỐ TIỀN ĐÃ THANH TOÁN</label><div class="amount-wrap"><input id="amount" type="text" inputmode="numeric" placeholder="0" autocomplete="off"><span>₫</span></div><label class="field-label" for="expense-note">GHI CHÚ <span class="optional">· không bắt buộc</span></label><input id="expense-note" class="note-input" type="text" placeholder="Ví dụ: Ăn tối cuối tuần"><button class="primary-button" id="pay-button">Ghi khoản chi <span>→</span></button><div class="form-hint">Khoản chi được chia đều cho cả 3 người.</div></article><div class="people-summary" id="people-summary"></div></div><div class="expense-right"><article class="card balance-card"><div class="card-kicker">TỔNG QUAN NHÓM <span class="balance-period">ĐANG THEO DÕI</span></div><div class="total-amount" id="total-spent">0 <small>₫</small></div><div class="total-caption">Tổng chi tiêu chung</div><div class="divider"></div><div class="settlement-title">Cân bằng thanh toán</div><div id="settlement"></div></article><article class="card history-card"><div class="history-header"><div><div class="card-kicker">HOẠT ĐỘNG</div><h3>Lịch sử khoản chi</h3></div><button class="text-button" id="clear-history">Xóa tất cả</button></div><div id="history-list"></div></article></div></div>
+      </section>
+      <footer><span>ĐƯỢC TẠO CHO NHỮNG NGÀY BẬN RỘN</span><span>♡ &nbsp; Một nhịp sống cân bằng</span></footer>
+    </main>
+  </div>
+  <script src="app.js?v=7"></script>
+</body>
+</html>

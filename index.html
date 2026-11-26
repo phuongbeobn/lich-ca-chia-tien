@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=19" />
 </head>
 <body>
   <div class="app-shell">
@@ -24,7 +24,7 @@
           <article class="card calendar-card"><div class="calendar-header"><button class="icon-button" id="prev-month" aria-label="Tháng trước">←</button><div class="month-title" id="month-title">Tháng 11 <span>2026</span></div><button class="icon-button" id="next-month" aria-label="Tháng sau">→</button><button class="today-button" id="go-today">Hôm nay</button></div><div class="calendar-grid" id="calendar"></div><div class="calendar-foot"><span><i class="legend-dot day"></i>Ngày</span><span><i class="legend-dot night"></i>Đêm</span><span><i class="flight-legend-dot">✈</i>Hiệu chuẩn</span></div></article>
           <aside class="right-column"><article class="card next-card"><div class="card-kicker"><span class="kicker-icon">◷</span> CA TIẾP THEO</div><div id="next-shift"></div><div class="countdown"><span class="countdown-dot"></span><span id="shift-status">ĐANG CẬP NHẬT</span></div></article><article class="card selected-card"><div class="card-kicker">CHI TIẾT NGÀY</div><div id="selected-detail"></div></article></aside>
         </div>
-        <section class="card flight-plan-card" aria-labelledby="flight-plan-title"><div class="flight-plan-header"><div><div class="card-kicker">KẾ HOẠCH BAY 2026–2027</div><h3 id="flight-plan-title">Hiệu chuẩn Gia Bình & Nội Bài</h3><p>Bấm một lịch bay để mở đúng ngày trên lịch tháng.</p></div><div class="flight-filters" role="group" aria-label="Lọc sân bay"><button class="flight-filter active" type="button" data-flight-filter="all">Tất cả 20</button><button class="flight-filter" type="button" data-flight-filter="GB">Gia Bình 14</button><button class="flight-filter" type="button" data-flight-filter="NB">Nội Bài 6</button></div></div><div id="flight-plan-list" class="flight-plan-list"></div><p class="flight-plan-note">Giờ hiển thị theo các khung ETD–ETA trong phụ lục. Ngày khảo sát 16–17/02 không ghi giờ cụ thể trong kế hoạch.</p></section>
+        <section class="card flight-plan-card" aria-labelledby="flight-plan-title"><div class="flight-plan-header"><div><div class="card-kicker">KẾ HOẠCH BAY 2026–2027</div><h3 id="flight-plan-title">Hiệu chuẩn Gia Bình & Nội Bài</h3><p>Bấm một lịch bay để mở đúng ngày trên lịch tháng.</p></div><div class="flight-filters" role="group" aria-label="Lọc sân bay"><button class="flight-filter active" type="button" data-flight-filter="all">Tất cả 21</button><button class="flight-filter" type="button" data-flight-filter="GB">Gia Bình 14</button><button class="flight-filter" type="button" data-flight-filter="NB">Nội Bài 7</button></div></div><div id="flight-plan-list" class="flight-plan-list"></div><p class="flight-plan-note">Giờ hiển thị theo các khung ETD–ETA trong phụ lục. Ngày khảo sát 16–17/02 không ghi giờ cụ thể trong kế hoạch.</p></section>
         <div class="schedule-note"><span class="note-icon">i</span><span>Lịch bắt đầu từ ca ngày <strong>23/11/2026, 08:00</strong>. Mỗi ca kéo dài 12 tiếng, sau đó nghỉ 24 tiếng. Tất cả các ngày, kể cả Thứ 7, Chủ nhật và ngày lễ, đều tính theo lịch ca.</span></div>
       </section>
       <section id="expenses-page" class="page hidden">
@@ -37,6 +37,6 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=1"></script>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 </body>
 </html>
